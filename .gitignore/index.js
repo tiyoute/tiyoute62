@@ -2,16 +2,8 @@
 const Discord = require('discord.js')
 const bot = new Discord.Client()
 var prefix = ('t!')
-var prefix = ('t.')
 const fs = require('fs')
 const warns = JSON.parse(fs.readFileSync('./warns.json'))
-
-const low = require('lowdb');
-const FileSync = require('lowdb/adapters/FileSync');
-const adapters  = new FileSync('database.json');
-const db = low(adapters);
- 
-db.defaults({ histoire : [],xp : []}).write()
 
 bot.login('NTM5MTExMDM1MzYyMzQ0OTYw.D3AORw.VKTY5XcFlSNk2eOvIUD6acOTsAU')
 
@@ -143,32 +135,3 @@ bot.on("message", message => {
         message.channel.send(embed)
     }
 })
-
-bot.on('message', message => {
- 
-    var msgauthor = message.author.id
-   
-    if(message.author.bot)return;
-   
-    if(!db.get("xp").find({user : msgauthor}).value()){
-        db.get("xp").push({user : msgauthor, xp: 1}).write();
-    }else{
-        var userxpdb = db.get("xp").filter({user : msgauthor}).find("xp").value();
-        console.log(userxpdb)
-        var userxp = Object.values(userxpdb)
-   
-        db.get("xp").find({user: msgauthor}).assign({user: msgauthor, xp: userxp[1] += 1}).write();
-   
-        if(message.content === prefix + "stat"){
-            var xp = db.get("xp").filter({user: msgauthor}).find('xp').value()
-            var xpfinal = Object.values(xp);
-            var xp_embed = new Discord.RichEmbed()
-                .setTitle(`Profil de ${message.author.username}`)
-                .setColor('00FFF7')
-                .addField("Nombre de messages :", `${xpfinal[1]} envoyés`)
-                .setFooter("Si un problème signalez le à Tiyoute#9817")
-                .setTimestamp()
-            message.channel.send({embed : xp_embed})
-        }
-    }
-  })
